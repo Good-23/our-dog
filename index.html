@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скоро ты будешь дома, малыш! ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(145deg, #fdeff2 0%, #f8e8ed 100%);
+            height: 100vh;                 /* тело точно на всю высоту окна */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 12px;                  /* чуть уменьшил паддинг, чтобы точно влезало */
+            position: relative;
+            overflow: hidden;                /* отключаем прокрутку полностью — ничего не вылезет */
+        }
+
+        /* Очень нежные лапки на фоне */
+        .paw-print {
+            position: absolute;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+            font-size: 5rem;
+            user-select: none;
+            transform: rotate(10deg);
+            filter: blur(2px);
+        }
+
+        .paw1 { top: 5%; left: 3%; transform: rotate(-15deg); }
+        .paw2 { bottom: 12%; right: 5%; transform: rotate(25deg) scaleX(-1); }
+        .paw3 { top: 20%; right: 15%; transform: rotate(5deg); opacity: 0.08; }
+        .paw4 { bottom: 25%; left: 8%; transform: rotate(-5deg) scaleX(-1); }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            max-height: 98vh;                /* ограничиваем, чтобы даже с padding влезть */
+            height: auto;
+            background-color: rgba(255, 250, 245, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 60px 60px 60px 60px;
+            box-shadow: 0 20px 40px rgba(180, 130, 150, 0.2), 0 8px 20px rgba(210, 160, 170, 0.15), inset 0 2px 5px rgba(255, 255, 255, 0.8);
+            padding: 20px 25px 20px 25px;    /* немного уменьшил паддинги */
+            border: 2px solid rgba(255, 240, 235, 0.8);
+            z-index: 10;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;          /* вертикальное центрирование внутри */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;              /* уменьшил отступ */
+            flex-shrink: 0;                   /* не сжимаем */
+        }
+
+        .title {
+            font-size: 2.5rem;                 /* чуть уменьшил для компактности */
+            font-weight: 500;
+            color: #967276;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 10px rgba(245, 220, 225, 0.7);
+            margin-bottom: 5px;
+            font-family: 'Pacifico', 'Quicksand', cursive;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;                 /* чуть меньше */
+            font-weight: 400;
+            color: #b48a9a;
+            background: rgba(255, 235, 240, 0.6);
+            display: inline-block;
+            padding: 8px 25px;                 /* уменьшил паддинг */
+            border-radius: 50px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 10px rgba(210, 160, 170, 0.15);
+            margin-top: 5px;
+            border: 1px solid #ffe9ef;
+            font-family: 'Pacifico', 'Quicksand', cursive;
+        }
+
+        .timer-box {
+            background: rgba(255, 245, 240, 0.8);
+            border-radius: 60px;
+            padding: 18px 15px;                /* плотнее */
+            margin: 10px 0 5px 0;               /* уменьшил вертикальные отступы */
+            border: 2px dashed #ecc6d2;
+            box-shadow: inset 0 0 0 5px #fff6f2, 0 15px 25px rgba(170, 140, 150, 0.15);
+            flex-shrink: 0;                     /* не даём сжиматься */
+        }
+
+        .big-timer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 12px;                      /* уменьшил gap */
+        }
+
+        .timer-unit {
+            background: #fff9fc;
+            border-radius: 40px;
+            padding: 12px 10px;                  /* компактнее */
+            min-width: 120px;                     /* чуть уже */
+            box-shadow: 0 5px 0 #dbb6c2, 0 12px 18px rgba(190, 140, 150, 0.15);
+            border: 1px solid white;
+        }
+
+        .unit-value {
+            font-size: 3.8rem;                    /* меньше цифры */
+            font-weight: 600;
+            color: #a7797f;
+            line-height: 1;
+            text-shadow: 0 2px 5px #ffe2e2;
+            font-family: 'Montserrat', 'Quicksand', sans-serif;
+        }
+
+        .unit-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #b38d99;
+            font-weight: 400;
+            border-top: 1px solid #f5d3db;
+            padding-top: 5px;
+            margin-top: 3px;
+        }
+
+        .extra-hours {
+            margin-top: 12px;                     /* меньше */
+            font-size: 1.8rem;                     /* уменьшил */
+            background: #fee9e6;
+            display: block;
+            text-align: center;
+            padding: 10px 35px;
+            border-radius: 100px;
+            color: #8d6774;
+            border: 2px solid white;
+            box-shadow: 0 4px 0 #dbb2bc;
+            font-weight: 450;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .extra-hours span {
+            font-weight: 700;
+            background: #ffffffb3;
+            padding: 3px 16px;
+            border-radius: 40px;
+            margin-left: 8px;
+            color: #8b5e68;
+            box-shadow: inset 0 1px 4px #ffe7ec;
+        }
+
+        .heart-message {
+            font-size: 1.3rem;                     /* чуть меньше */
+            color: #ba8b98;
+            margin: 10px 0 5px 0;                   /* сжал отступы */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: rgba(255, 230, 235, 0.6);
+            padding: 10px 15px;
+            border-radius: 70px;
+            flex-shrink: 0;
+        }
+
+        .heart-message span {
+            font-size: 2rem;
+            animation: heartbeat 1.8s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        .dog-icon {
+            font-size: 3rem;                        /* уменьшил */
+            filter: drop-shadow(2px 4px 6px #dbb6c2);
+            margin: 5px 0;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.15); }
+            35% { transform: scale(1.05); }
+            45% { transform: scale(1.1); }
+            55% { transform: scale(1); }
+        }
+
+        /* финальные лапки снизу — совсем легкие */
+        .footer-paws {
+            text-align: center;
+            margin-top: 5px;
+            color: #c7a0ab;
+            font-size: 1.8rem;
+            opacity: 0.5;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        /* Адаптация для телефонов */
+        @media (max-width: 550px) {
+            body { padding: 6px; }
+            .container { padding: 15px 12px; border-radius: 40px; max-height: 98vh; }
+            .title { font-size: 2rem; }
+            .subtitle { font-size: 1.2rem; padding: 6px 18px; }
+            .timer-unit { min-width: 100px; padding: 8px 5px; }
+            .unit-value { font-size: 2.8rem; }
+            .extra-hours { font-size: 1.3rem; padding: 8px 20px; }
+            .extra-hours span { padding: 2px 10px; }
+            .heart-message { font-size: 1.1rem; }
+            .dog-icon { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 380px) {
+            .big-timer { flex-direction: column; }
+            .timer-unit { width: 100%; }
+            .unit-value { font-size: 3rem; }
+        }
+    </style>
+    <!-- Подключаем шрифты для большей трогательности -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&family=Pacifico&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Разбросанные лапки для настроения -->
+    <div class="paw-print paw1">🐾</div>
+    <div class="paw-print paw2">🐾</div>
+    <div class="paw-print paw3">🐾</div>
+    <div class="paw-print paw4">🐾</div>
+
+    <div class="container">
+        <div class="header">
+            <div class="dog-icon">🐕 💕</div>
+            <h1 class="title">Скоро ты будешь дома!</h1>
+            <div class="subtitle">Наш маленький друг</div>
+        </div>
+
+        <!-- Главный таймер -->
+        <div class="timer-box">
+            <div class="big-timer">
+                <div class="timer-unit">
+                    <div class="unit-value" id="days">0</div>
+                    <div class="unit-label">Дней</div>
+                </div>
+                <div class="timer-unit">
+                    <div class="unit-value" id="hours">00</div>
+                    <div class="unit-label">Часов</div>
+                </div>
+                <div class="timer-unit">
+                    <div class="unit-value" id="minutes">00</div>
+                    <div class="unit-label">Минут</div>
+                </div>
+                <div class="timer-unit">
+                    <div class="unit-value" id="seconds">00</div>
+                    <div class="unit-label">Секунд</div>
+                </div>
+            </div>
+
+            <!-- Отдельный блок "чистых часов" по центру -->
+            <div class="extra-hours" id="total-hours-block">
+                ⏳ всего часов: <span id="total-hours">0</span>
+            </div>
+        </div>
+
+        <!-- Трогательное сообщение с сердечком -->
+        <div class="heart-message">
+            <span>❤️</span> 21 марта — день встречи  <span>❤️</span>
+        </div>
+
+        <!-- Лапки внизу для лёгкости -->
+        <div class="footer-paws">
+            🐾 🐾 🐾
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            function getTargetMarch21() {
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                let target = new Date(currentYear, 2, 21, 0, 0, 0);
+                if (today > target) {
+                    target = new Date(currentYear + 1, 2, 21, 0, 0, 0);
+                }
+                return target;
+            }
+
+            const targetDate = getTargetMarch21();
+
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            const totalHoursSpan = document.getElementById('total-hours');
+
+            function updateTimer() {
+                const now = new Date();
+                const diffMs = targetDate - now;
+
+                if (diffMs <= 0) {
+                    daysEl.innerText = '0';
+                    hoursEl.innerText = '00';
+                    minutesEl.innerText = '00';
+                    secondsEl.innerText = '00';
+                    totalHoursSpan.innerText = '0';
+                    document.querySelector('.heart-message').innerHTML = '<span>🏡</span>  Он уже дома!  <span>🐕</span>';
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diffMs / 1000);
+                const totalMinutes = Math.floor(totalSeconds / 60);
+                const totalHours = Math.floor(totalMinutes / 60);
+                const days = Math.floor(totalHours / 24);
+                const hours = totalHours % 24;
+                const minutes = totalMinutes % 60;
+                const seconds = totalSeconds % 60;
+
+                daysEl.innerText = days;
+                hoursEl.innerText = hours.toString().padStart(2, '0');
+                minutesEl.innerText = minutes.toString().padStart(2, '0');
+                secondsEl.innerText = seconds.toString().padStart(2, '0');
+                totalHoursSpan.innerText = totalHours;
+            }
+
+            function updateSpecialMessage() {
+                const diffMs = targetDate - new Date();
+                if (diffMs <= 0) {
+                    document.querySelector('.heart-message').innerHTML = '<span>🏡</span>  Он уже дома!  <span>🐕</span>';
+                    return;
+                }
+
+                const daysLeft = parseInt(daysEl.innerText, 10);
+                const messageBox = document.querySelector('.heart-message');
+                
+                if (daysLeft <= 1) {
+                    messageBox.innerHTML = '<span>🌟</span> Завтра великий день!  <span>🌟</span>';
+                } else if (daysLeft <= 3) {
+                    messageBox.innerHTML = '<span>✨</span> Уже почти дома!  <span>✨</span>';
+                } else {
+                    messageBox.innerHTML = '<span>❤️</span> 21 марта — день встречи  <span>❤️</span>';
+                }
+            }
+
+            function combinedUpdate() {
+                updateTimer();
+                updateSpecialMessage();
+            }
+
+            combinedUpdate();
+            setInterval(combinedUpdate, 1000);
+        })();
+    </script>
+</body>
+</html>
