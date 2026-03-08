@@ -118,12 +118,10 @@
             min-width: 120px;
             box-shadow: 0 5px 0 #dbb6c2, 0 12px 18px rgba(190, 140, 150, 0.15);
             border: 1px solid white;
-            
-            /* === ЦЕНТРИРОВАНИЕ СОДЕРЖИМОГО === */
             display: flex;
             flex-direction: column;
-            align-items: center;     /* центрирование по горизонтали */
-            justify-content: center; /* центрирование по вертикали */
+            align-items: center;
+            justify-content: center;
             text-align: center;
         }
 
@@ -134,7 +132,6 @@
             line-height: 1;
             text-shadow: 0 2px 5px #ffe2e2;
             font-family: 'Montserrat', 'Quicksand', sans-serif;
-            /* дополнительная страховка для центрирования текста */
             width: 100%;
         }
 
@@ -147,7 +144,7 @@
             border-top: 1px solid #f5d3db;
             padding-top: 5px;
             margin-top: 3px;
-            width: 100%; /* чтобы текст тоже был в рамках */
+            width: 100%;
         }
 
         .extra-hours {
@@ -175,6 +172,80 @@
             margin-left: 8px;
             color: #8b5e68;
             box-shadow: inset 0 1px 4px #ffe7ec;
+        }
+
+        /* Стили для прогресс-бара */
+        .progress-section {
+            margin: 15px 0 5px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .progress-label {
+            font-size: 1.2rem;
+            color: #a7797f;
+            margin-bottom: 6px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .progress-label span {
+            font-size: 1.5rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 24px;
+            background-color: #ffe2e8;
+            border-radius: 30px;
+            border: 2px solid white;
+            box-shadow: inset 0 2px 4px rgba(150, 100, 110, 0.2);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #fbb1c2, #ffc1d0, #ffd1dc);
+            border-radius: 30px;
+            box-shadow: 0 0 10px #ffb6c1;
+            transition: width 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: #8d5b68;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .progress-fill::after {
+            content: "🐾";
+            position: absolute;
+            right: 5px;
+            font-size: 1rem;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 2px white);
+        }
+
+        .progress-percent {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #a76e7a;
+            background: rgba(255, 240, 245, 0.7);
+            display: inline-block;
+            padding: 4px 18px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #ffd3db;
         }
 
         .heart-message {
@@ -234,6 +305,8 @@
             .extra-hours span { padding: 2px 10px; }
             .heart-message { font-size: 1.1rem; }
             .dog-icon { font-size: 2.5rem; }
+            .progress-label { font-size: 1rem; }
+            .progress-percent { font-size: 1.1rem; padding: 3px 12px; }
         }
 
         @media (max-width: 380px) {
@@ -288,6 +361,17 @@
             </div>
         </div>
 
+        <!-- Прогресс бар: от 23 февраля до 21 марта -->
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>⏳</span> с 23 февраля до встречи <span>🐾</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"> </div>
+            </div>
+            <div class="progress-percent" id="progress-percent">0%</div>
+        </div>
+
         <!-- Сообщение -->
         <div class="heart-message">
             <span>❤️</span> 21 марта — день встречи  <span>❤️</span>
@@ -301,10 +385,14 @@
 
     <script>
         (function() {
+            // Даты
+            const startDate = new Date(new Date().getFullYear(), 1, 23); // 23 февраля (месяц 1 = февраль)
+            // Целевая дата 21 марта
             function getTargetMarch21() {
                 const today = new Date();
                 const currentYear = today.getFullYear();
                 let target = new Date(currentYear, 2, 21, 0, 0, 0);
+                // Если сегодня после 21 марта, берём следующий год
                 if (today > target) {
                     target = new Date(currentYear + 1, 2, 21, 0, 0, 0);
                 }
@@ -313,27 +401,46 @@
 
             const targetDate = getTargetMarch21();
 
+            // Корректируем startDate в зависимости от года targetDate
+            // Если targetDate на следующий год, то и startDate должен быть того же года (февраль следующего года)
+            if (targetDate.getFullYear() > new Date().getFullYear()) {
+                startDate.setFullYear(targetDate.getFullYear());
+            } else {
+                startDate.setFullYear(targetDate.getFullYear());
+            }
+
+            // Элементы таймера
             const daysEl = document.getElementById('days');
             const hoursEl = document.getElementById('hours');
             const minutesEl = document.getElementById('minutes');
             const secondsEl = document.getElementById('seconds');
             const totalHoursSpan = document.getElementById('total-hours');
 
-            function updateTimer() {
-                const now = new Date();
-                const diffMs = targetDate - now;
+            // Элементы прогресс-бара
+            const progressFill = document.getElementById('progress-fill');
+            const progressPercent = document.getElementById('progress-percent');
 
-                if (diffMs <= 0) {
+            function updateTimerAndProgress() {
+                const now = new Date();
+                const diffToTarget = targetDate - now; // мс до цели
+
+                // Обновление таймера (как и раньше)
+                if (diffToTarget <= 0) {
                     daysEl.innerText = '0';
                     hoursEl.innerText = '00';
                     minutesEl.innerText = '00';
                     secondsEl.innerText = '00';
                     totalHoursSpan.innerText = '0';
                     document.querySelector('.heart-message').innerHTML = '<span>🏡</span>  Он уже дома!  <span>🐕</span>';
+                    
+                    // Прогресс 100%
+                    progressFill.style.width = '100%';
+                    progressPercent.innerText = '100%';
                     return;
                 }
 
-                const totalSeconds = Math.floor(diffMs / 1000);
+                // Таймер
+                const totalSeconds = Math.floor(diffToTarget / 1000);
                 const totalMinutes = Math.floor(totalSeconds / 60);
                 const totalHours = Math.floor(totalMinutes / 60);
                 const days = Math.floor(totalHours / 24);
@@ -346,6 +453,19 @@
                 minutesEl.innerText = minutes.toString().padStart(2, '0');
                 secondsEl.innerText = seconds.toString().padStart(2, '0');
                 totalHoursSpan.innerText = totalHours;
+
+                // --- Прогресс от startDate до targetDate ---
+                // Общая длительность ожидания в мс
+                const totalDuration = targetDate - startDate;
+                // Сколько уже прошло от startDate до now (не может быть отрицательным)
+                let elapsed = now - startDate;
+                if (elapsed < 0) elapsed = 0; // если ещё не наступило 23 февраля (маловероятно)
+                if (elapsed > totalDuration) elapsed = totalDuration;
+
+                const percent = (elapsed / totalDuration) * 100;
+                const percentFormatted = percent.toFixed(1);
+                progressFill.style.width = percent + '%';
+                progressPercent.innerText = percentFormatted + '%';
             }
 
             function updateSpecialMessage() {
@@ -368,7 +488,7 @@
             }
 
             function combinedUpdate() {
-                updateTimer();
+                updateTimerAndProgress();
                 updateSpecialMessage();
             }
 
